@@ -1,4 +1,4 @@
-package com.springbatch.excel.tutorial.poi;
+package com.springbatch.excel.tutorial.support.poi;
 
 public class UnknownCellTypeException extends RuntimeException {
 

@@ -17,3 +17,7 @@ spring:
 logging:
   level:
     org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+
+employee:
+  excel:
+    path: employee.xlsx
