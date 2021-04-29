@@ -1,4 +1,4 @@
-package com.springbatch.excel.tutorial.poi;
+package com.springbatch.excel.tutorial.support.poi;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -97,6 +97,8 @@ public abstract class AbstractExcelPoi<T> {
                     cellId.setCellStyle(rowStyle);
                 }
                 cellId.setCellValue(headers.get(i));
+
+                sheet.autoSizeColumn(i);
             }
         }
 

@@ -1,4 +1,4 @@
-package com.springbatch.excel.tutorial.poi;
+package com.springbatch.excel.tutorial.support.poi;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -38,6 +38,9 @@ public class CellFactory {
      */
     public Object getCellValue(Cell cell) {
         try{
+            if(cell == null){
+                return null;
+            }
             return EXCEL_CELL_VALUE.get(cell.getCellType()).apply(cell);
         }catch (Exception e){
             throw new UnknownCellTypeException(String.format("Unknown cell type ( %s )",cell.getCellType()));
