@@ -3,24 +3,26 @@ package com.springbatch.excel.tutorial.batch;
 import com.springbatch.excel.tutorial.batch.mappers.EmployeeItemRowMapper;
 import com.springbatch.excel.tutorial.domain.Employee;
 import com.springbatch.excel.tutorial.support.poi.AbstractExcelPoi;
-import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.apache.poi.ss.formula.eval.NotImplementedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-@StepScope
-public class EmployeeItemReader extends AbstractExcelPoi<Employee> implements ItemReader<Employee> {
+public class EmployeeItemReader extends AbstractExcelPoi<Employee> implements ItemReader<Employee> , StepExecutionListener {
 
-    private int nextBeneficiaryIndex = 0;
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeItemReader.class);
 
-    private final String filePath;
+    private int employeeIndex = 0;
 
-    public EmployeeItemReader(String filePath) {
-        super();
-        this.filePath = filePath;
-    }
+    private String excelFilePath;
 
     /**
      * {@inheritDoc}
@@ -28,27 +30,44 @@ public class EmployeeItemReader extends AbstractExcelPoi<Employee> implements It
     @Override
     public Employee read() {
 
-        List<Employee> beneficiaryDossierDatas;
-        Employee nextBeneficiary = null;
+        List<Employee> employeeList;
+        Employee employee = null;
 
-        // read data in file
-        beneficiaryDossierDatas = read(filePath, new EmployeeItemRowMapper());
+        try {
 
-        if(!beneficiaryDossierDatas.isEmpty()) {
+            String path = new ClassPathResource(excelFilePath).getFile().getPath();
 
-            if (nextBeneficiaryIndex < beneficiaryDossierDatas.size()) {
-                nextBeneficiary = beneficiaryDossierDatas.get(nextBeneficiaryIndex);
-                nextBeneficiaryIndex++;
-            } else {
-                nextBeneficiaryIndex = 0;
+            // read data in file
+            employeeList = read(path, new EmployeeItemRowMapper());
+
+            if(!employeeList.isEmpty()) {
+
+                if (employeeIndex < employeeList.size()) {
+                    employee = employeeList.get(employeeIndex);
+                    employeeIndex++;
+                } else {
+                    employeeIndex = 0;
+                }
             }
+        } catch (Exception e) {
+            LOGGER.warn("Cannot read the excel file: {}", e.getMessage());
         }
 
-        return nextBeneficiary;
+        return employee;
     }
 
     @Override
     public void write(String filePath , List<Employee> aList) {
+        throw new NotImplementedException("No need to implement this method in the context");
+    }
 
+    @Override
+    public void beforeStep(StepExecution stepExecution) {
+        excelFilePath = stepExecution.getJobParameters().getString("excelPath");
+    }
+
+    @Override
+    public ExitStatus afterStep(StepExecution stepExecution) {
+        return null;
     }
 }

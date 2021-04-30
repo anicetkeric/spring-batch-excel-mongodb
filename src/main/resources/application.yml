@@ -1,17 +1,18 @@
-
-
 spring:
   data:
     mongodb:
       host: localhost
       port: 27017
-      database: mongodb
+      database: employeedb
       username: admin
       password: admin
 
   jackson:
     default-property-inclusion: NON_NULL
-
+#disabled job run at startup
+  batch:
+    job:
+      enabled: false
 
 # Enable Logging mongo queries
 logging:
@@ -20,4 +21,4 @@ logging:
 
 employee:
   excel:
-    path: employee.xlsx
+    path: data/employee.xlsx
