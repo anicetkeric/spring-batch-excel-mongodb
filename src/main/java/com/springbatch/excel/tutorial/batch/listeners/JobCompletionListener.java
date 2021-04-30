@@ -14,13 +14,9 @@ public class JobCompletionListener extends JobExecutionListenerSupport {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobCompletionListener.class);
 
-    public JobCompletionListener() {
-    }
-
     @Override
     public void afterJob(JobExecution jobExecution) {
 
-        String pathToExtractionFile = jobExecution.getJobParameters().getString("pathToFile");
         String jobId = jobExecution.getJobParameters().getString("jobId");
 
          // get job's start time
@@ -30,11 +26,11 @@ public class JobCompletionListener extends JobExecutionListenerSupport {
 
         if(jobExecution.getStatus() == BatchStatus.COMPLETED) {
 
-            LOGGER.trace("===========================JOB FINISHED================================================");
-            LOGGER.trace("JobId      : {}",jobId);
-            LOGGER.trace("Path file     : {}", pathToExtractionFile);
-            LOGGER.trace("Date: {}", end);
-            LOGGER.trace("=======================================================================================");
+            LOGGER.info("===========================JOB FINISHED================================================");
+            LOGGER.info("JobId      : {}",jobId);
+            LOGGER.info("Start Date: {}", start);
+            LOGGER.info("End Date: {}", end);
+            LOGGER.info("=======================================================================================");
         }
 
     }

@@ -3,8 +3,8 @@ package com.springbatch.excel.tutorial.batch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -15,8 +15,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author aek
@@ -31,29 +29,27 @@ public class EmployeeJobLauncher {
     private final JobLauncher jobLauncher;
 
     @Value("${employee.excel.path}")
-    private String excelPath;
+    private String excelFilePath;
 
     EmployeeJobLauncher(Job job, JobLauncher jobLauncher) {
         this.job = job;
         this.jobLauncher = jobLauncher;
     }
 
-    @Scheduled(cron = "*/2 * * * *")
+    //@Scheduled(cron = "*/2 * * * *")
+    @Scheduled(fixedRate = 120000)
     void launchFileToJob() throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException, JobRestartException {
         LOGGER.info("Starting job");
 
-        jobLauncher.run(job, jobParameters());
+        JobParameters params = new JobParametersBuilder()
+                .addLong("jobId",System.currentTimeMillis())
+                .addDate("currentTime",new Date())
+                .addString("excelPath",excelFilePath)
+                .toJobParameters();
+
+        jobLauncher.run(job, params);
 
         LOGGER.info("Stopping job");
-    }
-
-    private JobParameters jobParameters() {
-        Map<String, JobParameter> parameters = new HashMap<>();
-
-        parameters.put("currentTime", new JobParameter(new Date()));
-        parameters.put("excelPath", new JobParameter(excelPath));
-
-        return new JobParameters(parameters);
     }
 
 }
