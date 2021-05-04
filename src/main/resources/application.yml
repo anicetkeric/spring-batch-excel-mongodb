@@ -21,4 +21,5 @@ logging:
 
 employee:
   excel:
-    path: data/employee.xlsx
+    processing-dir: data/processing/
+    results-dir: data/results/
