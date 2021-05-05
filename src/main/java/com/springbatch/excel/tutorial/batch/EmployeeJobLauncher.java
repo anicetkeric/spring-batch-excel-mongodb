@@ -28,18 +28,19 @@ public class EmployeeJobLauncher {
 
     private final JobLauncher jobLauncher;
 
-    @Value("${employee.excel.path}")
-    private String excelFilePath;
+    @Value("${employee.excel.processingfolder}")
+    private String processingDir;
 
     EmployeeJobLauncher(Job job, JobLauncher jobLauncher) {
         this.job = job;
         this.jobLauncher = jobLauncher;
     }
 
-    //@Scheduled(cron = "*/2 * * * *")
+    // run every 2 min
     @Scheduled(fixedRate = 120000)
     void launchFileToJob() throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException, JobRestartException {
         LOGGER.info("Starting job");
+        String excelFilePath = String.format("%s/employee.xlsx", processingDir);
 
         JobParameters params = new JobParametersBuilder()
                 .addLong("jobId",System.currentTimeMillis())

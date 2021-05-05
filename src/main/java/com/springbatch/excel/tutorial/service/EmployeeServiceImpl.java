@@ -2,38 +2,24 @@ package com.springbatch.excel.tutorial.service;
 
 import com.springbatch.excel.tutorial.domain.Employee;
 import com.springbatch.excel.tutorial.repository.EmployeeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
+    private final EmployeeRepository employeeRepository;
 
-    @Override
-    public List<Employee> getAll() {
-        return employeeRepository.findAll();
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Employee save(Employee employee) {
-        return this.employeeRepository.save(employee);
+    public Optional<Employee> getByNumber(String number) {
+        return employeeRepository.findByNumber(number);
     }
-
-    @Override
-    public Optional<Employee> getById(String id) {
-        return employeeRepository.findById(id);
-    }
-
-    @Override
-    public void deleteById(String id) {
-        this.employeeRepository.deleteById(id);
-    }
-
-
-
 }

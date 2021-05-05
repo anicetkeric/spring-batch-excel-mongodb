@@ -68,7 +68,7 @@ public class BatchConfiguration {
 
 
     /**
-     * Declaration step
+     * step declaration
      * @return {@link Step}
      */
     @Bean
@@ -84,7 +84,7 @@ public class BatchConfiguration {
 
 
     /**
-     * Declaration job
+     * job declaration
      * @param listener {@link JobCompletionListener}
      * @return {@link Job}
      */
