@@ -18,6 +18,7 @@ public class JobCompletionListener extends JobExecutionListenerSupport {
     public void afterJob(JobExecution jobExecution) {
 
         String jobId = jobExecution.getJobParameters().getString("jobId");
+        String excelFilePath = jobExecution.getJobParameters().getString("excelPath");
 
          // get job's start time
         Date start = jobExecution.getCreateTime();
@@ -26,11 +27,12 @@ public class JobCompletionListener extends JobExecutionListenerSupport {
 
         if(jobExecution.getStatus() == BatchStatus.COMPLETED) {
 
-            LOGGER.info("===========================JOB FINISHED================================================");
+            LOGGER.info("==========JOB FINISHED=======");
             LOGGER.info("JobId      : {}",jobId);
+            LOGGER.info("excel Path      : {}",excelFilePath);
             LOGGER.info("Start Date: {}", start);
             LOGGER.info("End Date: {}", end);
-            LOGGER.info("=======================================================================================");
+            LOGGER.info("==============================");
         }
 
     }

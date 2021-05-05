@@ -78,6 +78,8 @@ public abstract class AbstractExcelPoi<T> {
     }
 
 
+
+
     /**
      * Create header of file
      * @param sheet excel sheet
@@ -89,18 +91,41 @@ public abstract class AbstractExcelPoi<T> {
         if(!headers.isEmpty()){
             // Create a Row
             Row row = sheet.createRow(0);
-
             // Create cells
             for (int i = 0; i < headers.size(); i++) {
-                Cell cellId = row.createCell(i);
-                if(rowStyle != null){
-                    cellId.setCellStyle(rowStyle);
-                }
-                cellId.setCellValue(headers.get(i));
-
+                createCell(row, i, headers.get(i), rowStyle);
                 sheet.autoSizeColumn(i);
             }
         }
 
     }
+
+    /**
+     * @param row file row
+     * @param columnCount index of column
+     * @param value the value to will set
+     * @param style cel row
+     * @return Cell value
+     */
+    public Cell createCell(Row row, int columnCount, Object value, CellStyle style) {
+        Cell cell = row.createCell(columnCount);
+        if (value instanceof Integer) {
+            cell.setCellValue((Integer) value);
+        } else if (value instanceof Boolean) {
+            cell.setCellValue((Boolean) value);
+        }else if (value instanceof Double) {
+            cell.setCellValue((Double) value);
+        } else {
+            cell.setCellValue((String) value);
+        }
+
+
+        if(style != null){
+            cell.setCellStyle(style);
+        }
+
+        return cell;
+    }
+
+
 }
