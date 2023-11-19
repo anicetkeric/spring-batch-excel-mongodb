@@ -4,6 +4,7 @@ import com.springbatch.excel.tutorial.batch.listeners.JobCompletionListener;
 import com.springbatch.excel.tutorial.batch.processors.EmployeeItemProcessor;
 import com.springbatch.excel.tutorial.batch.validators.EmployeeJobParametersValidator;
 import com.springbatch.excel.tutorial.domain.Employee;
+import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.batch.core.Step;
@@ -27,16 +28,12 @@ import java.util.Collections;
  */
 @EnableBatchProcessing
 @Configuration
+@RequiredArgsConstructor
 public class BatchConfiguration {
 
     public final JobBuilderFactory jobBuilderFactory;
 
     public final StepBuilderFactory stepBuilderFactory;
-
-    public BatchConfiguration(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory) {
-        this.jobBuilderFactory = jobBuilderFactory;
-        this.stepBuilderFactory = stepBuilderFactory;
-    }
 
     @Bean
     public JobParametersValidator jobParametersValidator() {
@@ -62,13 +59,16 @@ public class BatchConfiguration {
 
     @Bean
     public MongoItemWriter<Employee> writer(MongoTemplate mongoTemplate) {
-        return new MongoItemWriterBuilder<Employee>().template(mongoTemplate).collection("employee")
+        return new MongoItemWriterBuilder<Employee>()
+                .template(mongoTemplate)
+                .collection("employee")
                 .build();
     }
 
 
     /**
      * step declaration
+     *
      * @return {@link Step}
      */
     @Bean
@@ -81,10 +81,9 @@ public class BatchConfiguration {
                 .build();
     }
 
-
-
     /**
      * job declaration
+     *
      * @param listener {@link JobCompletionListener}
      * @return {@link Job}
      */

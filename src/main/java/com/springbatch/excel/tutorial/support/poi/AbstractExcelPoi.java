@@ -1,5 +1,6 @@
 package com.springbatch.excel.tutorial.support.poi;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -9,26 +10,23 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @param <T> generic Class
  * @author aek
  */
+@Slf4j
 public abstract class AbstractExcelPoi<T> {
-
-    private static final Logger LOGGER = Logger.getLogger(AbstractExcelPoi.class.getName());
 
     /**
      * @param filePath file path
-     * @param aList list of object
+     * @param aList    list of object
      */
     public abstract void write(String filePath, List<T> aList);
 
     /**
      * @param filePathStr file path location
-     * @param rowMapper RowMapper object
+     * @param rowMapper   RowMapper object
      * @return list of <T>
      */
     public List<T> read(String filePathStr, final RowMapper<T> rowMapper) {
@@ -38,20 +36,20 @@ public abstract class AbstractExcelPoi<T> {
 
             Sheet sheet = workbook.getSheetAt(0);
 
-                sheet.forEach(row -> {
-                    // skip header
-                    if (row.getRowNum() != 0){
-                        try {
-                            bookList.add(rowMapper.transformerRow(row));
-                        } catch (ParseException exception) {
-                            LOGGER.log(Level.WARNING, "RowMapper Parse exception");
-                        }
+            sheet.forEach(row -> {
+                // skip header
+                if (row.getRowNum() != 0) {
+                    try {
+                        bookList.add(rowMapper.transformerRow(row));
+                    } catch (ParseException exception) {
+                        log.warn("RowMapper Parse exception");
                     }
-                });
+                }
+            });
 
             return bookList;
         } catch (IOException e) {
-            throw new ExcelFileException(String.format("Cannot read the file: %s",e.getMessage()));
+            throw new ExcelFileException(String.format("Cannot read the file: %s", e.getMessage()));
         }
     }
 
@@ -62,7 +60,7 @@ public abstract class AbstractExcelPoi<T> {
     private Workbook getWorkbook(String filePathStr) {
         Workbook workbook;
 
-        try{
+        try {
             try (FileInputStream inputStream = new FileInputStream(new File(filePathStr))) {
                 if (filePathStr.endsWith("xlsx")) {
                     workbook = new XSSFWorkbook(inputStream);
@@ -70,7 +68,7 @@ public abstract class AbstractExcelPoi<T> {
                     throw new ExcelFileException("The specified file is not Excel file");
                 }
             }
-        }catch(SecurityException | IOException e){
+        } catch (SecurityException | IOException e) {
             throw new ExcelFileException("The specified file is not Excel file");
         }
 
@@ -78,17 +76,16 @@ public abstract class AbstractExcelPoi<T> {
     }
 
 
-
-
     /**
      * Create header of file
-     * @param sheet excel sheet
-     * @param headers list string of header
+     *
+     * @param sheet    excel sheet
+     * @param headers  list string of header
      * @param rowStyle style of header row
      */
     public void createHeaderRow(Sheet sheet, List<String> headers, CellStyle rowStyle) {
 
-        if(!headers.isEmpty()){
+        if (!headers.isEmpty()) {
             // Create a Row
             Row row = sheet.createRow(0);
             // Create cells
@@ -101,10 +98,10 @@ public abstract class AbstractExcelPoi<T> {
     }
 
     /**
-     * @param row file row
+     * @param row         file row
      * @param columnCount index of column
-     * @param value the value to will set
-     * @param style cel row
+     * @param value       the value to will set
+     * @param style       cel row
      * @return Cell value
      */
     public Cell createCell(Row row, int columnCount, Object value, CellStyle style) {
@@ -113,14 +110,14 @@ public abstract class AbstractExcelPoi<T> {
             cell.setCellValue((Integer) value);
         } else if (value instanceof Boolean) {
             cell.setCellValue((Boolean) value);
-        }else if (value instanceof Double) {
+        } else if (value instanceof Double) {
             cell.setCellValue((Double) value);
         } else {
             cell.setCellValue((String) value);
         }
 
 
-        if(style != null){
+        if (style != null) {
             cell.setCellStyle(style);
         }
 
