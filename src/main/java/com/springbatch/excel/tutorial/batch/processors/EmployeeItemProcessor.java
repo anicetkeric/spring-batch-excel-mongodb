@@ -3,11 +3,9 @@ package com.springbatch.excel.tutorial.batch.processors;
 import com.springbatch.excel.tutorial.domain.Employee;
 import com.springbatch.excel.tutorial.repository.EmployeeRepository;
 import com.springbatch.excel.tutorial.support.poi.AbstractExcelPoi;
-import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
@@ -28,9 +26,8 @@ import java.util.List;
 /**
  * @author Eric KOUAME
  */
-public class EmployeeItemProcessor extends AbstractExcelPoi<Employee>  implements ItemProcessor<Employee, Employee>, StepExecutionListener {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeItemProcessor.class);
+@Slf4j
+public class EmployeeItemProcessor extends AbstractExcelPoi<Employee> implements ItemProcessor<Employee, Employee>, StepExecutionListener {
 
     private static final List<Employee> existingEmployees = new ArrayList<>();
 
@@ -46,9 +43,8 @@ public class EmployeeItemProcessor extends AbstractExcelPoi<Employee>  implement
     @Override
     public Employee process(Employee item) {
 
-        if(repository.findByNumber(item.getNumber()).isPresent()){
+        if (repository.findByNumber(item.number()).isPresent()) {
             existingEmployees.add(item);
-
             return null;
         }
 
@@ -60,25 +56,32 @@ public class EmployeeItemProcessor extends AbstractExcelPoi<Employee>  implement
         /* Nothing to do before */
     }
 
-    @SneakyThrows
+    // @SneakyThrows
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
-        String jobId = stepExecution.getJobParameters().getString("jobId");
+        String jobId = stepExecution.getJobParameters().getParameter("jobId").getValue().toString();
 
-        if(stepExecution.getStatus() == BatchStatus.COMPLETED && !CollectionUtils.isEmpty(existingEmployees)) {
+        if (stepExecution.getStatus() == BatchStatus.COMPLETED && !CollectionUtils.isEmpty(existingEmployees)) {
             // create log file. if completed
-            String path = new ClassPathResource(resultsfolder).getFile().getPath();
-            write(String.format("%s/employe-result-%s.xlsx", path, jobId),existingEmployees);
+            String path = null;
+            try {
+                path = new ClassPathResource(resultsfolder).getFile().getPath();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            write(String.format("%s/employe-result-%s.xlsx", path, jobId), existingEmployees);
         }
         return null;
     }
+
     /**
      * Create and write results file. employee duplicate entries
+     *
      * @param filePath file path
      * @param aList    list of employee
      */
     @Override
-    public void write(String filePath , List<Employee> aList) {
+    public void write(String filePath, List<Employee> aList) {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             // Create a Sheet
             Sheet sheet = workbook.createSheet("RESULTS");
@@ -96,28 +99,27 @@ public class EmployeeItemProcessor extends AbstractExcelPoi<Employee>  implement
                     "Email",
                     "Number"
             );
-            createHeaderRow(sheet, headers,cellStyle);
+            createHeaderRow(sheet, headers, cellStyle);
 
             // Create Other rows and cells with BeneficiaryExtraction data
             int rowNum = 1;
-            for(Employee employee: aList) {
+            for (Employee employee : aList) {
                 Row row = sheet.createRow(rowNum++);
 
-                createCell(row, 0, employee.getFirstName(), null);
-                createCell(row, 1, employee.getLastName(), null);
-                createCell(row, 2, employee.getEmail(), null);
-                createCell(row, 3, employee.getNumber(), null);
+                createCell(row, 0, employee.firstName(), null);
+                createCell(row, 1, employee.lastName(), null);
+                createCell(row, 2, employee.email(), null);
+                createCell(row, 3, employee.number(), null);
             }
 
             //lets write the excel data to file now
             try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
                 workbook.write(outputStream);
-                LOGGER.info("Results File written successfully");
+                log.info("Results File written successfully");
             }
-        }
-        catch (IOException e) {
-            LOGGER.warn("Cannot write results file: {}", e.getMessage());
-        }finally {
+        } catch (IOException e) {
+            log.warn("Cannot write results file: {}", e.getMessage());
+        } finally {
             existingEmployees.clear();
         }
     }

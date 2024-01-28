@@ -9,11 +9,12 @@ import java.util.function.Function;
 
 /**
  * Extract cell value
+ *
  * @author aek
  */
 public class CellFactory {
 
-    private static final EnumMap<CellType, Function<Cell,Object>>
+    private static final EnumMap<CellType, Function<Cell, Object>>
             EXCEL_CELL_VALUE = new EnumMap<>(CellType.class);
 
     static {
@@ -37,13 +38,13 @@ public class CellFactory {
      * @return Object row
      */
     public Object getCellValue(Cell cell) {
-        try{
-            if(cell == null){
+        try {
+            if (cell == null) {
                 return null;
             }
             return EXCEL_CELL_VALUE.get(cell.getCellType()).apply(cell);
-        }catch (Exception e){
-            throw new UnknownCellTypeException(String.format("Unknown cell type ( %s )",cell.getCellType()));
+        } catch (Exception e) {
+            throw new UnknownCellTypeException(String.format("Unknown cell type ( %s )", cell.getCellType()));
         }
     }
 
