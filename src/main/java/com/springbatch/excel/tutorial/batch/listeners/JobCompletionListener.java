@@ -6,7 +6,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.listener.JobExecutionListenerSupport;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Component
@@ -15,13 +15,13 @@ public class JobCompletionListener extends JobExecutionListenerSupport {
     @Override
     public void afterJob(JobExecution jobExecution) {
 
-        String jobId = jobExecution.getJobParameters().getString("jobId");
+        String jobId = jobExecution.getJobParameters().getParameter("jobId").toString();
         String excelFilePath = jobExecution.getJobParameters().getString("excelPath");
 
         // get job's start time
-        Date start = jobExecution.getCreateTime();
+        LocalDateTime start = jobExecution.getCreateTime();
         //  get job's end time
-        Date end = jobExecution.getEndTime();
+        LocalDateTime end = jobExecution.getEndTime();
 
         if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
 

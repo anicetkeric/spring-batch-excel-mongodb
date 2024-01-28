@@ -45,7 +45,6 @@ public class EmployeeItemProcessor extends AbstractExcelPoi<Employee> implements
 
         if (repository.findByNumber(item.number()).isPresent()) {
             existingEmployees.add(item);
-
             return null;
         }
 
@@ -60,7 +59,7 @@ public class EmployeeItemProcessor extends AbstractExcelPoi<Employee> implements
     // @SneakyThrows
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
-        String jobId = stepExecution.getJobParameters().getString("jobId");
+        String jobId = stepExecution.getJobParameters().getParameter("jobId").getValue().toString();
 
         if (stepExecution.getStatus() == BatchStatus.COMPLETED && !CollectionUtils.isEmpty(existingEmployees)) {
             // create log file. if completed
